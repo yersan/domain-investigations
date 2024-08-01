@@ -1,0 +1,15 @@
+[Unit]
+Description=JBoss EAP Secondary host
+Wants=network-online.target 
+After=network-online.target
+
+[Service]
+Environment=LAUNCH_JBOSS_IN_BACKGROUND=true
+Type=simple
+ExecStart=sh /var/eap/bin/domain.sh --host-config=host-secondary.xml -Djboss.bind.address.management=10.0.2.15 -Djboss.bind.address=0.0.0.0 -Djboss.domain.primary.address=10.0.2.2
+Restart=always
+RestartSec=20
+
+[Install]
+WantedBy=multi-user.target
+#WantedBy=graphical.target

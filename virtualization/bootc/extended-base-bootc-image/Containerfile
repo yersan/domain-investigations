@@ -1,0 +1,8 @@
+FROM quay.io/centos-bootc/centos-bootc:stream9
+
+# Fix missing directory
+RUN mkdir -p /var/lib/alternatives
+RUN dnf --setopt=tsflags=nodocs install -y java-21-openjdk-devel && rpm -q java-21-openjdk-devel
+
+RUN mkdir /var/jboss
+COPY jboss-eap-installation-manager /var/jboss/jboss-eap-installation-manager

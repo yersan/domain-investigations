@@ -1,0 +1,29 @@
+# Save the output of this file and use kubectl create -f to import
+# it into Kubernetes.
+#
+# Created with podman-5.1.1
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    app: domain-controller
+  # This is the hostname, used to connect from host controller to domain mode
+  name: domain-controller
+spec:
+  containers:
+  - env:
+    - name: TERM
+      value: xterm
+    - name: JBOSS_EAP_DOMAIN_HOST_NAMES
+      value: secondary
+    - name: SERVER_ARGS
+      value: --host-config=host-primary.xml
+    image: quay.io/jdenise/my-domain-controller:latest
+    name: domain-controller-container
+    ports:
+    - containerPort: 9990
+      hostIP: 0.0.0.0
+      hostPort: 9990
+    securityContext:
+      runAsNonRoot: true
+

@@ -1,0 +1,20 @@
+sudo podman build -t quay.io/jfdenise/eap-centos-bootc:latest .
+sudo podman rm  wildfly-systemd-bootc-jfdenise
+sudo podman run \
+  --name wildfly-systemd-bootc-jfdenise \
+  --tty \
+  --privileged \
+  --security-opt label=type:unconfined_t \
+  -v /home/jdenise/workspaces/domain-investigations/virtualization/bootc/extended-base-bootc:/output/ \
+  -v /var/lib/containers/storage:/var/lib/containers/storage \
+  -v $(pwd)/config.toml:/config.toml:ro \
+  --label bootc.image.builder=true \
+  quay.io/centos-bootc/bootc-image-builder:latest-1720185748 \
+  quay.io/jfdenise/eap-centos-bootc:latest \
+  --output \
+  /output/ \
+  --local \
+  --type \
+  raw \
+  --target-arch \
+  amd64

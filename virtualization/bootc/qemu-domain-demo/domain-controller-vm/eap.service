@@ -1,0 +1,15 @@
+[Unit]
+Description=JBoss EAP domain controller
+Wants=network-online.target 
+After=network-online.target
+
+[Service]
+Environment=LAUNCH_JBOSS_IN_BACKGROUND=true
+Type=simple
+ExecStart=sh /var/eap/bin/domain.sh --host-config=host-primary.xml -b 10.0.2.15 -bmanagement 0.0.0.0 
+Restart=always
+RestartSec=20
+
+[Install]
+WantedBy=multi-user.target
+#WantedBy=graphical.target

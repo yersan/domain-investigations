@@ -1,0 +1,3 @@
+embed-host-controller --std-out=echo
+deploy /tmp/kitchensink.war --all-server-groups --enabled
+stop-embedded-host-controller

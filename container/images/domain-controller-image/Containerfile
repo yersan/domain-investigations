@@ -1,0 +1,6 @@
+FROM quay.io/jfdenise/eap-8.0-managed-domain-image:latest
+COPY --chown=jboss:root extensions $JBOSS_HOME/extensions
+RUN chmod a+x $JBOSS_HOME/extensions/postconfigure.sh
+# Copy deployment
+COPY kitchensink.war /tmp
+
