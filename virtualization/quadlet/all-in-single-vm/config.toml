@@ -1,0 +1,5 @@
+[[customizations.user]]
+name = "root"
+password = "root"
+key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHguc9DpDQXcb8e4jrSGur7F0TA3Mm6eL1N9jq2AtMXe jfdenise@gmail.com"
+groups = ["root"]

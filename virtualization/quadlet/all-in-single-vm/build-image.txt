@@ -1,0 +1,21 @@
+sudo podman build -t quay.io/jdenise/eap-8-all-in-bootc:latest .
+sudo podman rm  eap-8-all-in-bootc-builder
+sudo podman run \
+  --name eap-8-all-in-bootc-builder \
+  --tty \
+  --privileged \
+  --security-opt label=type:unconfined_t \
+  -v /home/jdenise/workspaces/bootc/domain-investigations/virtualization/quadlet/all-in-single-vm:/output/ \
+  -v /var/lib/containers/storage:/var/lib/containers/storage \
+  -v $(pwd)/config.toml:/config.toml:ro \
+  --label bootc.image.builder=true \
+  quay.io/centos-bootc/bootc-image-builder:latest-1720185748 \
+  quay.io/jdenise/eap-8-all-in-bootc:latest \
+  --output \
+  /output/ \
+  --local \
+  --type \
+  raw \
+  --target-arch \
+  amd64
+

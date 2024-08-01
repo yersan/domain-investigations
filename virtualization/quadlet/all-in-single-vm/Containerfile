@@ -1,0 +1,3 @@
+FROM quay.io/centos-bootc/centos-bootc:stream9
+COPY eap-domain.container /usr/share/containers/systemd/
+COPY eap-host.container /usr/share/containers/systemd/
