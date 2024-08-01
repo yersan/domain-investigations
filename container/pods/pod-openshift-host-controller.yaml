@@ -17,8 +17,8 @@ spec:
       value: --host-config=my-host.xml -Djboss.domain.primary.address=domain-controller-9990 -Djboss.management.http.port=9991
     - name: JAVA_MAX_MEM_RATIO
       value: 25
-    - name: CLI_GRACEFUL_SHUTDOWN
-      value: true
+    - name: JBOSS_EAP_DOMAIN_HOST_NAME
+      value: secondary
     image: quay.io/jdenise/my-host-controller:1.0
     name: secondary-host-controller-container
     ports:

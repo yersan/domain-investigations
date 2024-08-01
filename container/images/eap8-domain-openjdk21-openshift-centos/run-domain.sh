@@ -10,21 +10,14 @@ function run_clean_shutdown() {
     management_port=$((9990 + PORT_OFFSET))
   fi
   log_error "*** JBOSS EAP Managed Domain wrapper process ($$) received TERM signal ***"
-  hosts=${JBOSS_EAP_DOMAIN_HOST_NAMES}
-  if [ -n "$hosts" ]; then
-    for host in ${hosts//,/ }
-    do
-      log_error "*** Shutting down $host"
-      if [ -z ${management_port} ]; then
-        $JBOSS_HOME/bin/jboss-cli.sh -c "shutdown --host=${host}"
-      else
-        $JBOSS_HOME/bin/jboss-cli.sh --commands="connect remote+http://localhost:${management_port},shutdown --host=${host}"
-      fi
-      wait $!
-    done
+  host=${JBOSS_EAP_DOMAIN_HOST_NAME}
+  log_error "*** Shutting down $host"
+  if [ -z ${management_port} ]; then
+    $JBOSS_HOME/bin/jboss-cli.sh -c "/host=${host}:shutdown()"
   else
-    log_error "*** No host to shutdown..."
+    $JBOSS_HOME/bin/jboss-cli.sh --commands="connect remote+http://localhost:${management_port},/host=${host}:shutdown()"
   fi
+  wait $!
 }
 
 function run_setup_shutdown_hook() {

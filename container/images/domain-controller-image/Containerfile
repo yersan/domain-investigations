@@ -1,4 +1,4 @@
-FROM quay.io/jfdenise/eap-8.0-managed-domain-image:latest
+FROM quay.io/jdenise/jboss-eap8-domain-openjdk21-openshift-centos:latest
 COPY --chown=jboss:root extensions $JBOSS_HOME/extensions
 RUN chmod a+x $JBOSS_HOME/extensions/postconfigure.sh
 # Copy deployment

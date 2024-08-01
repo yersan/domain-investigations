@@ -14,8 +14,8 @@ spec:
   - env:
     - name: TERM
       value: xterm
-    - name: JBOSS_EAP_DOMAIN_HOST_NAMES
-      value: secondary
+    - name: JBOSS_EAP_DOMAIN_HOST_NAME
+      value: primary
     - name: SERVER_ARGS
       value: --host-config=host-primary.xml
     image: quay.io/jdenise/my-domain-controller:latest
