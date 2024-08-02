@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: host-controller 
+  namespace: jdenise-dev
+spec:
+  internalTrafficPolicy: Cluster 
+  ports:
+  - name: app 
+    port: 8080
+    protocol: TCP
+    targetPort: 8080 
+  selector:
+    kubevirt.io/domain: host-controller-vm-3 
+  type: ClusterIP

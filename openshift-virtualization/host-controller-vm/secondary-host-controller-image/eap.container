@@ -1,0 +1,16 @@
+[Unit]
+Description=JBoss EAP host controller
+Wants=network-online.target 
+After=network-online.target
+
+[Container]
+ContainerName=secondary-host-controller
+PublishPort=8080:8080
+Image=quay.io/jdenise/my-host-controller:latest
+Environment=SERVER_ARGS="--host-config=my-host.xml -Djboss.domain.primary.address=domain-controller "
+Environment=JAVA_MAX_MEM_RATIO=25
+Environment=JBOSS_EAP_DOMAIN_HOST_NAME=secondary
+AutoUpdate=registry
+
+[Install]
+WantedBy=default.target

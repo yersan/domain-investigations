@@ -1,0 +1,73 @@
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: host-controller-vm-3
+  annotations:
+    description: VM Host Controller
+  labels:
+    app: host-controller-vm-3
+    os.template.kubevirt.io/centos9: 'true'
+  namespace: jdenise-dev
+spec:
+  running: false
+  template:
+    metadata:
+      annotations:
+        vm.kubevirt.io/flavor: small
+        vm.kubevirt.io/os: centos9
+        vm.kubevirt.io/workload: server
+      labels:
+        kubevirt.io/domain: host-controller-vm-3
+        kubevirt.io/size: small
+    spec:
+      domain:
+        cpu:
+          cores: 1
+          sockets: 1
+          threads: 1
+        devices:
+          disks:
+            - disk:
+                bus: virtio
+              name: host-controller-dv-disk
+            - disk:
+                bus: virtio
+              name: cloudinitdisk
+          interfaces:
+            - masquerade: {}
+              model: virtio
+              name: default
+          networkInterfaceMultiqueue: true
+          rng: {}
+        features:
+          acpi: {}
+          smm:
+            enabled: true
+        firmware:
+          bootloader:
+            bios: {}
+        machine:
+          type: q35
+        memory:
+          guest: 8Gi
+        resources:
+          limits:
+            memory: 8Gi
+          requests:
+            memory: 7Gi
+      hostname: host-controller
+      networks:
+        - name: default
+          pod: {}
+      terminationGracePeriodSeconds: 180
+      volumes:
+        - name: host-controller-dv-disk
+          persistentVolumeClaim:
+            claimName: hc-volume
+        - cloudInitNoCloud:
+            userData: |-
+              #cloud-config
+              user: fedora
+              password: fedora
+              chpasswd: { expire: False }
+          name: cloudinitdisk

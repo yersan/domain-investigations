@@ -1,0 +1,15 @@
+[Unit]
+Description=JBoss EAP domain controller
+Wants=network-online.target 
+After=network-online.target
+
+[Container]
+ContainerName=domain-controller
+PublishPort=9990:9990
+Image=quay.io/jdenise/my-domain-controller:latest
+Environment=JBOSS_EAP_DOMAIN_HOST_NAME=primary
+Environment=SERVER_ARGS=--host-config=host-primary.xml
+AutoUpdate=registry
+
+[Install]
+WantedBy=default.target
