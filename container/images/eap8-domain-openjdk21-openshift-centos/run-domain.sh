@@ -120,7 +120,7 @@ imgName=${JBOSS_IMAGE_NAME:-$IMAGE_NAME}
     if [ -n "$JBOSS_EAP_DOMAIN_HOST_CONFIG" ]; then
       SERVER_ARGS="--host-config=$JBOSS_EAP_DOMAIN_HOST_CONFIG $SERVER_ARGS"
     fi
-    SERVER_ARGS="${JAVA_PROXY_OPTIONS} -Djboss.node.name=${JBOSS_NODE_NAME} -Djboss.tx.node.id=${JBOSS_TX_NODE_ID} ${PORT_OFFSET_PROPERTY} -b ${PUBLIC_IP_ADDRESS} -bmanagement ${MANAGEMENT_IP_ADDRESS} -Dwildfly.statistics-enabled=${ENABLE_STATISTICS} ${SERVER_ARGS}"
+    SERVER_ARGS="${JAVA_PROXY_OPTIONS} -Djboss.node.name=${JBOSS_NODE_NAME} -Djboss.tx.node.id=${JBOSS_TX_NODE_ID} ${PORT_OFFSET_PROPERTY} -b ${PUBLIC_IP_ADDRESS} -bprivate ${PUBLIC_IP_ADDRESS} -bmanagement ${MANAGEMENT_IP_ADDRESS} -Dwildfly.statistics-enabled=${ENABLE_STATISTICS} ${SERVER_ARGS}"
     $JBOSS_HOME/bin/domain.sh ${SERVER_ARGS} &
 
 pid=$!

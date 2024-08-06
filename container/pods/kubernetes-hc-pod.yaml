@@ -1,0 +1,41 @@
+kind: Pod
+apiVersion: v1
+metadata:
+  name: secondary-openshift
+  labels:
+    app: secondary-openshift
+    domain.member: demo
+spec:
+  restartPolicy: Always
+  serviceAccountName: default
+  terminationGracePeriodSeconds: 30
+  preemptionPolicy: PreemptLowerPriority
+  containers:
+    - resources:
+        limits:
+          cpu: '1'
+          memory: 1000Mi
+        requests:
+          cpu: 10m
+          memory: 64Mi
+      terminationMessagePath: /dev/termination-log
+      name: secondary-openshift-secondary-host-controller-container
+      env:
+        - name: JBOSS_EAP_DOMAIN_HOST_CONFIG
+          value: my-host.xml
+        - name: JBOSS_EAP_DOMAIN_HOST_NAME
+          value: secondary-openshift
+        - name: TERM
+          value: xterm
+        - name: KUBERNETES_NAMESPACE
+          value: jdenise-dev
+        - name: JBOSS_EAP_DOMAIN_PRIMARY_ADDRESS
+          value: domain-controller-9990
+      ports:
+        - containerPort: 8080
+          protocol: TCP
+          hostIP: 0.0.0.0
+      imagePullPolicy: IfNotPresent
+      terminationMessagePolicy: File
+      image: 'quay.io/jdenise/openshift-host-controller:latest'
+  

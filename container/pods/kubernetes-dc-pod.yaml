@@ -1,0 +1,37 @@
+kind: Pod
+apiVersion: v1
+metadata:
+  name: domain-controller
+  labels:
+    app: domain-controller
+spec:
+  restartPolicy: Always
+  terminationGracePeriodSeconds: 30
+  containers:
+    - resources:
+        limits:
+          cpu: '1'
+          memory: 1000Mi
+        requests:
+          cpu: 10m
+          memory: 64Mi
+      terminationMessagePath: /dev/termination-log
+      name: domain-controller-domain-controller-container
+      env:
+        - name: TERM
+          value: xterm
+        - name: JBOSS_EAP_DOMAIN_HOST_CONFIG
+          value: my-host-primary.xml
+        - name: JBOSS_EAP_DOMAIN_SERVER_GROUP
+          value: openshift-group
+        - name: JBOSS_EAP_DOMAIN_HOST_NAME
+          value: primary
+        - name: JBOSS_EAP_DOMAIN_DOMAIN_CONFIG
+          value: openshift-domain.xml
+      ports:
+        - containerPort: 9990
+          protocol: TCP
+          hostIP: 0.0.0.0
+      imagePullPolicy: IfNotPresent
+      terminationMessagePolicy: File
+      image: 'quay.io/jdenise/openshift-domain-controller:latest'
