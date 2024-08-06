@@ -1,6 +1,7 @@
-FROM quay.io/jdenise/jboss-eap8-domain-openjdk21-openshift-centos:latest
+FROM quay.io/jdenise/jboss-eap8-domain-openjdk21-openshift:latest
 COPY --chown=jboss:root extensions $JBOSS_HOME/extensions
 RUN chmod a+x $JBOSS_HOME/extensions/postconfigure.sh
+COPY --chown=jboss:root configurations/*.xml $JBOSS_HOME/domain/configuration
 # Copy deployment
-COPY kitchensink.war /tmp
+COPY web-clustering.war /tmp
 

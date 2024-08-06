@@ -6,8 +6,8 @@ apiVersion: v1
 kind: Pod
 metadata:
   labels:
-    app: secondary
-  name: secondary
+    app: ternary
+  name: ternary
 spec:
   containers:
   - env:
@@ -16,7 +16,7 @@ spec:
     - name: JBOSS_EAP_DOMAIN_HOST_CONFIG
       value: my-host.xml
     - name: JBOSS_EAP_DOMAIN_HOST_NAME
-      value: secondary
+      value: ternary
     - name: JBOSS_EAP_DOMAIN_PRIMARY_ADDRESS
       value: domain-controller
     image: quay.io/jdenise/openshift-host-controller:latest
@@ -24,7 +24,7 @@ spec:
     ports:
     - containerPort: 8080
       hostIP: 0.0.0.0
-      hostPort: 8080
+      hostPort: 8081
     securityContext:
       runAsNonRoot: true
 

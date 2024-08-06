@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<host xmlns="urn:jboss:domain:20.0">
+<host xmlns="urn:jboss:domain:20.0" name="primary">
     <extensions>
         <extension module="org.jboss.as.jmx"/>
         <extension module="org.wildfly.extension.core-management"/>
@@ -34,23 +34,13 @@
         </management-interfaces>
     </management>
     <domain-controller>
-        <remote>
-            <discovery-options>
-                <static-discovery name="primary" protocol="${jboss.domain.primary.protocol:remote+http}" host="${jboss.domain.primary.address}" port="${jboss.domain.primary.port:9990}"/>
-            </discovery-options>
-        </remote>
+        <local/>
     </domain-controller>
     <interfaces>
         <interface name="management">
             <inet-address value="${jboss.bind.address.management:127.0.0.1}"/>
         </interface>
-        <interface name="public">
-            <inet-address value="${jboss.bind.address:127.0.0.1}"/>
-        </interface>
     </interfaces>
-    <servers>
-        <server name="server-one" group="openshift-group"/>
-    </servers>
     <profile>
         <subsystem xmlns="urn:jboss:domain:core-management:1.0"/>
         <subsystem xmlns="urn:wildfly:elytron:18.0" final-providers="combined-providers" disallowed-providers="OracleUcrypto">

@@ -1,5 +1,5 @@
 embed-host-controller --std-out=echo --host-config=my-host.xml
-/host=secondary/subsystem=elytron/authentication-configuration=secondary-hc-auth:add(authentication-name=secondary, credential-reference={clear-text=secondary})
-/host=secondary/subsystem=elytron/authentication-context=secondary-hc-auth-context:add(match-rules=[{authentication-configuration=secondary-hc-auth}])
-/host=secondary:write-attribute(name=domain-controller.remote.authentication-context, value=secondary-hc-auth-context)
+/host=${env.JBOSS_EAP_DOMAIN_HOST_NAME}/subsystem=elytron/authentication-configuration=hc-auth:add(authentication-name=secondary, credential-reference={clear-text=secondary})
+/host=${env.JBOSS_EAP_DOMAIN_HOST_NAME}/subsystem=elytron/authentication-context=hc-auth-context:add(match-rules=[{authentication-configuration=hc-auth}])
+/host=${env.JBOSS_EAP_DOMAIN_HOST_NAME}:write-attribute(name=domain-controller.remote.authentication-context, value=hc-auth-context)
 stop-embedded-host-controller

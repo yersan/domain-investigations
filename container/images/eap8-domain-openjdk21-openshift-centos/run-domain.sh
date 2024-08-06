@@ -4,25 +4,17 @@
 source ${JBOSS_HOME}/bin/launch/launch.sh
 source ${JBOSS_HOME}/bin/launch/openshift-node-name.sh
 
-function run_clean_shutdown() {
-  local management_port=""
-  if [ -n "${PORT_OFFSET}" ]; then
-    management_port=$((9990 + PORT_OFFSET))
-  fi
+function run_clean_shutdown_domain() {
   log_error "*** JBOSS EAP Managed Domain wrapper process ($$) received TERM signal ***"
   host=${JBOSS_EAP_DOMAIN_HOST_NAME}
   log_error "*** Shutting down $host"
-  if [ -z ${management_port} ]; then
-    $JBOSS_HOME/bin/jboss-cli.sh -c "/host=${host}:shutdown()"
-  else
-    $JBOSS_HOME/bin/jboss-cli.sh --commands="connect remote+http://localhost:${management_port},/host=${host}:shutdown()"
-  fi
+  $JBOSS_HOME/bin/jboss-cli.sh -c "shutdown --host=${host}"
   wait $!
 }
 
 function run_setup_shutdown_hook() {
-  trap "run_clean_shutdown" TERM
-  trap "run_clean_shutdown" INT
+  trap "run_clean_shutdown_domain" TERM
+  trap "run_clean_shutdown_domain" INT
 
   if [ -n "$CLI_GRACEFUL_SHUTDOWN" ] ; then
     trap "" TERM
@@ -37,6 +29,99 @@ if [ -f $JBOSS_HOME/extensions/postconfigure.sh ]; then
   sh $JBOSS_HOME/extensions/postconfigure.sh
 fi
 
-SERVER_LAUNCH_SCRIPT_OVERRIDE=domain.sh /opt/jboss/container/wildfly/run/run &
+# Copied from run launcher.
+source "${JBOSS_CONTAINER_WILDFLY_RUN_MODULE}/run-utils.sh"
+
+# HANDLE JAVA OPTIONS
+source /usr/local/dynamic-resources/dynamic_resources.sh > /dev/null
+GC_METASPACE_SIZE=${GC_METASPACE_SIZE:-96}
+
+JAVA_OPTS="$(adjust_java_options ${JAVA_OPTS})"
+
+# If JAVA_DIAGNOSTICS and there is jvm_specific_diagnostics, move the settings to PREPEND_JAVA_OPTS
+# to bypass the specific EAP checks done on JAVA_OPTS in standalone.sh that could remove the GC EAP specific log configurations
+JVM_SPECIFIC_DIAGNOSTICS=$(jvm_specific_diagnostics)
+if [ "x$JAVA_DIAGNOSTICS" != "x" ] && [ "x{JVM_SPECIFIC_DIAGNOSTICS}" != "x" ]; then
+  JAVA_OPTS=${JAVA_OPTS/${JVM_SPECIFIC_DIAGNOSTICS} /}
+  PREPEND_JAVA_OPTS="${JVM_SPECIFIC_DIAGNOSTICS} ${PREPEND_JAVA_OPTS}"
+fi
+
+# Make sure that we use /dev/urandom (CLOUD-422)
+JAVA_OPTS="${JAVA_OPTS} -Djava.security.egd=file:/dev/./urandom"
+
+JAVA_OPTS="${JAVA_OPTS} -Djava.net.preferIPv4Stack=true"
+
+if [ -z "$JBOSS_MODULES_SYSTEM_PKGS" ]; then
+  JBOSS_MODULES_SYSTEM_PKGS="jdk.nashorn.api,com.sun.crypto.provider"
+fi
+
+if [ -n "$JBOSS_MODULES_SYSTEM_PKGS_APPEND" ]; then
+  JBOSS_MODULES_SYSTEM_PKGS="$JBOSS_MODULES_SYSTEM_PKGS,$JBOSS_MODULES_SYSTEM_PKGS_APPEND"
+fi
+
+ JAVA_OPTS="${JAVA_OPTS} -Djboss.modules.system.pkgs=${JBOSS_MODULES_SYSTEM_PKGS}"
+
+# DO WE KEEP?
+# White list packages for use in ObjectMessages: CLOUD-703
+if [ -n "$MQ_SERIALIZABLE_PACKAGES" ]; then
+  JAVA_OPTS="${JAVA_OPTS} -Dorg.apache.activemq.SERIALIZABLE_PACKAGES=${MQ_SERIALIZABLE_PACKAGES}"
+fi
+
+# Append to JAVA_OPTS.
+JAVA_OPTS="$JAVA_OPTS $JAVA_OPTS_APPEND"
+
+#Handle proxy options
+source /opt/run-java/proxy-options
+eval preConfigure
+eval configure
+
+imgName=${JBOSS_IMAGE_NAME:-$IMAGE_NAME}
+    imgVersion=${JBOSS_IMAGE_VERSION:-$IMAGE_VERSION}
+
+    log_info "Running $imgName image, version $imgVersion"
+
+    # Handle port offset
+    if [ -n "${PORT_OFFSET}" ]; then
+      PORT_OFFSET_PROPERTY="-Djboss.socket.binding.port-offset=${PORT_OFFSET}"
+    fi
+
+    PUBLIC_IP_ADDRESS=${SERVER_PUBLIC_BIND_ADDRESS:-$(hostname -i)}
+    MANAGEMENT_IP_ADDRESS=${SERVER_MANAGEMENT_BIND_ADDRESS:-0.0.0.0}
+    ENABLE_STATISTICS=${SERVER_ENABLE_STATISTICS:-true}
+
+    #Ensure node name (FOR NOW NEEDED PERHAPS REVISIT FOR EAP8)
+    run_init_node_name
+    if [ -n "$JBOSS_EAP_DOMAIN_SERVER_GROUP" ]; then
+      rm -rf /tmp/jvm-cli-script.cli
+      commands="
+        embed-host-controller --std-out=echo --domain-config=$JBOSS_EAP_DOMAIN_DOMAIN_CONFIG
+        if (outcome != success) of /server-group=$JBOSS_EAP_DOMAIN_SERVER_GROUP/jvm=openshift:read-resource
+          /server-group=$JBOSS_EAP_DOMAIN_SERVER_GROUP/jvm=openshift:add"
+          for option in $(echo $PREPEND_JAVA_OPTS); do
+            commands="$commands
+                /server-group=$JBOSS_EAP_DOMAIN_SERVER_GROUP/jvm=openshift:add-jvm-option(jvm-option=\"$option\")"
+         done
+      for option in $(echo $JAVA_OPTS); do
+        commands="$commands
+                /server-group=$JBOSS_EAP_DOMAIN_SERVER_GROUP/jvm=openshift:add-jvm-option(jvm-option=\"$option\")"
+      done
+      commands="$commands
+         end-if"
+      echo "$commands" >> /tmp/jvm-cli-script.cli
+      cat /tmp/jvm-cli-script.cli
+      $JBOSS_HOME/bin/jboss-cli.sh --file=/tmp/jvm-cli-script.cli
+    fi
+    if [ -n "$JBOSS_EAP_DOMAIN_PRIMARY_ADDRESS" ]; then
+      SERVER_ARGS="-Djboss.domain.primary.address=$JBOSS_EAP_DOMAIN_PRIMARY_ADDRESS $SERVER_ARGS"
+    fi
+    if [ -n "$JBOSS_EAP_DOMAIN_DOMAIN_CONFIG" ]; then
+      SERVER_ARGS="--domain-config=$JBOSS_EAP_DOMAIN_DOMAIN_CONFIG $SERVER_ARGS"
+    fi
+    if [ -n "$JBOSS_EAP_DOMAIN_HOST_CONFIG" ]; then
+      SERVER_ARGS="--host-config=$JBOSS_EAP_DOMAIN_HOST_CONFIG $SERVER_ARGS"
+    fi
+    SERVER_ARGS="${JAVA_PROXY_OPTIONS} -Djboss.node.name=${JBOSS_NODE_NAME} -Djboss.tx.node.id=${JBOSS_TX_NODE_ID} ${PORT_OFFSET_PROPERTY} -b ${PUBLIC_IP_ADDRESS} -bmanagement ${MANAGEMENT_IP_ADDRESS} -Dwildfly.statistics-enabled=${ENABLE_STATISTICS} ${SERVER_ARGS}"
+    $JBOSS_HOME/bin/domain.sh ${SERVER_ARGS} &
+
 pid=$!
 wait $pid 2>/dev/null

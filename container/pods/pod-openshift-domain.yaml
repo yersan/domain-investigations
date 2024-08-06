@@ -16,9 +16,13 @@ spec:
       value: xterm
     - name: JBOSS_EAP_DOMAIN_HOST_NAME
       value: primary
-    - name: SERVER_ARGS
-      value: --host-config=host-primary.xml
-    image: quay.io/jdenise/my-domain-controller:latest
+    - name: JBOSS_EAP_DOMAIN_SERVER_GROUP
+      value: openshift-group
+    - name: JBOSS_EAP_DOMAIN_DOMAIN_CONFIG
+      value: openshift-domain.xml
+    - name: JBOSS_EAP_DOMAIN_HOST_CONFIG
+      value: my-host-primary.xml
+    image: quay.io/jdenise/openshift-domain-controller:latest
     name: domain-controller-container
     ports:
     - containerPort: 9990
