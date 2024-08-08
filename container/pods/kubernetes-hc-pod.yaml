@@ -25,17 +25,33 @@ spec:
           value: my-host.xml
         - name: JBOSS_EAP_DOMAIN_HOST_NAME
           value: secondary-openshift
+        - name: JBOSS_EAP_DOMAIN_SERVER_GROUP
+          value: openshift-group
         - name: TERM
           value: xterm
-        - name: KUBERNETES_NAMESPACE
-          value: jdenise-dev
         - name: JBOSS_EAP_DOMAIN_PRIMARY_ADDRESS
-          value: domain-controller-9990
+          value: domain-controller
+        - name: JBOSS_EAP_DOMAIN_USER
+          value: demo
+        - name: JBOSS_EAP_DOMAIN_PASSWORD
+          value: demo
+        # Env vars to connect to PostgreSQL DB
+        - name: POSTGRESQL_DATABASE
+          value: todos-db
+        - name: POSTGRESQL_USER
+          value: todos-db
+        - name: POSTGRESQL_PASSWORD
+          value: todos-db
+        - name: POSTGRESQL_DATASOURCE
+          value: ToDos
+        - name: POSTGRESQL_SERVICE_HOST
+          value: database-server
+        - name: POSTGRESQL_SERVICE_PORT
+          value: "5432"
       ports:
         - containerPort: 8080
           protocol: TCP
-          hostIP: 0.0.0.0
       imagePullPolicy: IfNotPresent
       terminationMessagePolicy: File
-      image: 'quay.io/jdenise/openshift-host-controller:latest'
+      image: 'quay.io/jdenise/openshift-host-controller:11.0'
   

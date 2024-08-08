@@ -1,0 +1,19 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: domain-controller
+spec:
+  ipFamilies:
+    - IPv4
+  ports:
+    - name: domain-controller-9990
+      protocol: TCP
+      port: 9990
+      targetPort: 9990
+  internalTrafficPolicy: Cluster
+  type: ClusterIP
+  ipFamilyPolicy: SingleStack
+  sessionAffinity: None
+  selector:
+    app: domain-controller
+

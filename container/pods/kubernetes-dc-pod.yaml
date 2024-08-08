@@ -22,16 +22,17 @@ spec:
           value: xterm
         - name: JBOSS_EAP_DOMAIN_HOST_CONFIG
           value: my-host-primary.xml
-        - name: JBOSS_EAP_DOMAIN_SERVER_GROUP
-          value: openshift-group
         - name: JBOSS_EAP_DOMAIN_HOST_NAME
           value: primary
         - name: JBOSS_EAP_DOMAIN_DOMAIN_CONFIG
           value: openshift-domain.xml
+        - name: JBOSS_EAP_DOMAIN_USER
+          value: demo
+        - name: JBOSS_EAP_DOMAIN_PASSWORD
+          value: demo
       ports:
         - containerPort: 9990
           protocol: TCP
-          hostIP: 0.0.0.0
       imagePullPolicy: IfNotPresent
       terminationMessagePolicy: File
-      image: 'quay.io/jdenise/openshift-domain-controller:latest'
+      image: 'quay.io/jdenise/openshift-domain-controller:22.0'
