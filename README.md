@@ -1,5 +1,22 @@
 # domain-investigations
 
+# Managed Domain demo 
+
+A demo that runs:
+* A POD for a domain controller with openshift-group and openshift-ha-group. todo-backend.war deployed in openshift-group, web-clustering.war deployed in openshift-ha-group
+* A POD for a host controller + EAP server-1 based on openshift-group to run todo-backend
+* A first POD for a host controller + EAP server-1 based on openshift-ha-group to run web-clustering
+* A second POD for a host controller + EAP server-1 based on openshift-ha-group to run web-clustering
+
+* cd container/pods
+* oc create -f domain-controller-service.yaml
+* oc create -f domain-ping-service.yaml
+* oc create -f kubernetes-dc.pod.yaml
+* oc create -f kubernetes-hc.pod.yaml
+* oc create -f kubernetes-hc-ha1.pod.yaml
+* oc create -f kubernetes-hc-ha2.pod.yaml
+
+# Virtual machine demo
 The latest POC can be run without requiring to build container nor VM images:
 
 * cd openshift-virtualization/domain-controller-vm/
