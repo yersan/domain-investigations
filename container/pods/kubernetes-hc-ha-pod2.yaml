@@ -1,9 +1,9 @@
 kind: Pod
 apiVersion: v1
 metadata:
-  name: hc-ha1-openshift
+  name: hc-ha2-openshift
   labels:
-    app: hc-ha1-openshift
+    app: hc-ha2-openshift
     domain.member: demo
 spec:
   restartPolicy: Always
@@ -24,7 +24,7 @@ spec:
         - name: JBOSS_EAP_DOMAIN_HOST_CONFIG
           value: my-host-ha.xml
         - name: JBOSS_EAP_DOMAIN_HOST_NAME
-          value: hc-ha1-openshift
+          value: hc-ha2-openshift
         - name: TERM
           value: xterm
         - name: KUBERNETES_NAMESPACE

@@ -25,8 +25,6 @@ spec:
           value: my-host.xml
         - name: JBOSS_EAP_DOMAIN_HOST_NAME
           value: secondary-openshift
-        - name: JBOSS_EAP_DOMAIN_SERVER_GROUP
-          value: openshift-group
         - name: TERM
           value: xterm
         - name: JBOSS_EAP_DOMAIN_PRIMARY_ADDRESS
@@ -53,5 +51,5 @@ spec:
           protocol: TCP
       imagePullPolicy: IfNotPresent
       terminationMessagePolicy: File
-      image: 'quay.io/jdenise/openshift-host-controller:11.0'
+      image: 'quay.io/jdenise/openshift-host-controller:14.0'
   

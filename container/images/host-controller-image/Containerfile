@@ -1,5 +1,3 @@
 FROM quay.io/jdenise/jboss-eap8-domain-openjdk21-openshift:latest
 COPY --chown=jboss:root extensions $JBOSS_HOME/extensions
 RUN chmod a+x $JBOSS_HOME/extensions/postconfigure.sh
-#Copy host configuration, due to host name being set and openshift-group usage
-COPY --chown=jboss:root my-host.xml $JBOSS_HOME/domain/configuration

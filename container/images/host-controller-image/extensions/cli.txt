@@ -1,4 +1,4 @@
-embed-host-controller --std-out=echo --host-config=my-host.xml
+embed-host-controller --std-out=echo --host-config=${env.JBOSS_EAP_DOMAIN_HOST_CONFIG}
 /host=${env.JBOSS_EAP_DOMAIN_HOST_NAME}/subsystem=elytron/authentication-configuration=hc-auth:add(authentication-name=${env.JBOSS_EAP_DOMAIN_USER}, credential-reference={clear-text=${env.JBOSS_EAP_DOMAIN_PASSWORD}})
 /host=${env.JBOSS_EAP_DOMAIN_HOST_NAME}/subsystem=elytron/authentication-context=hc-auth-context:add(match-rules=[{authentication-configuration=hc-auth}])
 /host=${env.JBOSS_EAP_DOMAIN_HOST_NAME}:write-attribute(name=domain-controller.remote.authentication-context, value=hc-auth-context)
