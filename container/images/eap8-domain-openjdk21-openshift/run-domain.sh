@@ -91,24 +91,23 @@ imgName=${JBOSS_IMAGE_NAME:-$IMAGE_NAME}
 
     #Ensure node name (FOR NOW NEEDED PERHAPS REVISIT FOR EAP8)
     run_init_node_name
-    if [ -n "$JBOSS_EAP_DOMAIN_DOMAIN_CONFIG" ]; then
+    #Only in host controller
+    if [ -n "$JBOSS_EAP_DOMAIN_PRIMARY_ADDRESS" ]; then
       rm -rf /tmp/jvm-cli-script.cli
       commands="
-        embed-host-controller --std-out=echo --domain-config=$JBOSS_EAP_DOMAIN_DOMAIN_CONFIG --host-config=$JBOSS_EAP_DOMAIN_HOST_CONFIG
-        for grp in :read-children-names(child-type=server-group
-          if (outcome != success) of /server-group=\$grp/jvm=openshift:read-resource
-            /server-group=\$grp/jvm=openshift:add"
+        embed-host-controller --std-out=echo --host-config=$JBOSS_EAP_DOMAIN_HOST_CONFIG
+          if (outcome != success) of /host=$JBOSS_EAP_DOMAIN_HOST_NAME/jvm=openshift:read-resource
+            /host=$JBOSS_EAP_DOMAIN_HOST_NAME/jvm=openshift:add"
           for option in $(echo $PREPEND_JAVA_OPTS); do
             commands="$commands
-                /server-group=\$grp/jvm=openshift:add-jvm-option(jvm-option=\"$option\")"
+                /host=$JBOSS_EAP_DOMAIN_HOST_NAME/jvm=openshift:add-jvm-option(jvm-option=\"$option\")"
           done
       for option in $(echo $JAVA_OPTS); do
         commands="$commands
-                /server-group=\$grp/jvm=openshift:add-jvm-option(jvm-option=\"$option\")"
+                /host=$JBOSS_EAP_DOMAIN_HOST_NAME/jvm=openshift:add-jvm-option(jvm-option=\"$option\")"
       done
       commands="$commands
-         end-if
-         done"
+         end-if"
       echo "$commands" >> /tmp/jvm-cli-script.cli
       cat /tmp/jvm-cli-script.cli
       $JBOSS_HOME/bin/jboss-cli.sh --file=/tmp/jvm-cli-script.cli

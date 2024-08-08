@@ -25,6 +25,8 @@ spec:
           value: my-host.xml
         - name: JBOSS_EAP_DOMAIN_HOST_NAME
           value: secondary-openshift
+        - name: JAVA_MAX_MEM_RATIO
+          value: "70.0"
         - name: TERM
           value: xterm
         - name: JBOSS_EAP_DOMAIN_PRIMARY_ADDRESS
@@ -51,5 +53,5 @@ spec:
           protocol: TCP
       imagePullPolicy: IfNotPresent
       terminationMessagePolicy: File
-      image: 'quay.io/jdenise/openshift-host-controller:demo-1.0'
+      image: 'quay.io/jdenise/openshift-host-controller:demo-2.2'
   
