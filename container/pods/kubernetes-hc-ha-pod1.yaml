@@ -29,7 +29,7 @@ spec:
           value: xterm
         - name: KUBERNETES_NAMESPACE
           value: jdenise-dev
-        - name: JGROUPS_PING_PROTOCOL
+        - name: OPENSHIFT_DNS_PING_SERVICE_NAME
           value: ping-service
         - name: JBOSS_EAP_DOMAIN_PRIMARY_ADDRESS
           value: domain-controller
@@ -42,5 +42,5 @@ spec:
           protocol: TCP
       imagePullPolicy: IfNotPresent
       terminationMessagePolicy: File
-      image: 'quay.io/jdenise/openshift-host-controller:14.0'
+      image: 'quay.io/jdenise/openshift-host-controller:demo-1.0'
   

@@ -51,5 +51,5 @@ spec:
           protocol: TCP
       imagePullPolicy: IfNotPresent
       terminationMessagePolicy: File
-      image: 'quay.io/jdenise/openshift-host-controller:14.0'
+      image: 'quay.io/jdenise/openshift-host-controller:demo-1.0'
   
