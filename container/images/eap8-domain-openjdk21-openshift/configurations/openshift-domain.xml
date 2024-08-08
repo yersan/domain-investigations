@@ -415,7 +415,7 @@
                     <stack name="tcp">
                         <transport type="TCP" socket-binding="jgroups-tcp"/>
                         <protocol type="dns.DNS_PING">
-                            <property name="dns_query">ping-service</property>
+                            <property name="dns_query">${env.OPENSHIFT_DNS_PING_SERVICE_NAME}</property>
                             <property name="async_discovery_use_separate_thread_per_request">true</property>
                         </protocol>
                         <protocol type="RED"/>
@@ -434,7 +434,7 @@
                     <stack name="udp">
                         <transport type="UDP" socket-binding="jgroups-udp"/>
                         <protocol type="dns.DNS_PING">
-                            <property name="dns_query">${env.JGROUPS_PING_PROTOCOL}</property>
+                            <property name="dns_query">${env.OPENSHIFT_DNS_PING_SERVICE_NAME}</property>
                             <property name="async_discovery_use_separate_thread_per_request">true</property>
                         </protocol>
                         <protocol type="RED"/>
