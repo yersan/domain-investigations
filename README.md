@@ -8,7 +8,8 @@ A demo that runs:
 * A first POD for a host controller + EAP server-1 based on openshift-ha-group to run web-clustering
 * A second POD for a host controller + EAP server-1 based on openshift-ha-group to run web-clustering
 
-* Create the posgresql server: 
+* Create the posgresql server:
+
 ** Select a postgresql template from the catalog and instantiate it. 
 ** Set the Database service name to be: database-server 
 ** Set the user, password and database name to : todos-db
