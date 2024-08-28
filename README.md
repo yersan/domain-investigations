@@ -30,6 +30,8 @@ To access the non HA running applications:
 To access the HA running application :
 * <ha-route>/web-clustering
 
+You can kill one of the 2 ha pods, the session is persisted.
+ 
 # Virtual machine demo
 The latest POC can be run without requiring to build container nor VM images:
 
