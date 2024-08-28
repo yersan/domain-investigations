@@ -11,10 +11,10 @@ A demo that runs:
 * cd container/pods
 * oc create -f domain-controller-service.yaml
 * oc create -f domain-ping-service.yaml
-* oc create -f kubernetes-dc.pod.yaml
-* oc create -f kubernetes-hc.pod.yaml
-* oc create -f kubernetes-hc-ha1.pod.yaml
-* oc create -f kubernetes-hc-ha2.pod.yaml
+* oc create -f kubernetes-dc-pod.yaml
+* oc create -f kubernetes-hc-pod.yaml
+* oc create -f kubernetes-hc-ha-pod1.yaml
+* oc create -f kubernetes-hc-ha-pod2.yaml
 
 # Virtual machine demo
 The latest POC can be run without requiring to build container nor VM images:
