@@ -9,9 +9,9 @@ A demo that runs:
 * A second POD for a host controller + EAP server-1 based on openshift-ha-group to run web-clustering
 
 * Create the posgresql server: 
-- Select a postgresql template from the catalog and instantiate it. 
-- Set the Database service name to be: database-server 
-- Set the user, password and database name to : todos-db
+** Select a postgresql template from the catalog and instantiate it. 
+** Set the Database service name to be: database-server 
+** Set the user, password and database name to : todos-db
 
 * cd container/pods
 * oc create -f domain-controller-service.yaml
@@ -25,10 +25,10 @@ A demo that runs:
 * oc create -f kubernetes-hc-ha-pod2.yaml
 
 To access the non HA running applications:
-* <host-controller-route>/todo-backend
+* `<host-controller-route>/todo-backend`
 
 To access the HA running application :
-* <ha-route>/web-clustering
+* `<ha-route>/web-clustering`
 
 You can kill one of the 2 ha pods, the session is persisted.
  
