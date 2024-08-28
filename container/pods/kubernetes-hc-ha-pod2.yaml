@@ -3,7 +3,7 @@ apiVersion: v1
 metadata:
   name: hc-ha2-openshift
   labels:
-    app: hc-ha2-openshift
+    app: hc-ha-openshift
     domain.member: demo
 spec:
   restartPolicy: Always

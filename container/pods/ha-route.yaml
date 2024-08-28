@@ -1,0 +1,14 @@
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  name: ha-route
+spec:
+  to:
+    kind: Service
+    name: ha-service
+    weight: 100
+  port:
+    targetPort: ha-service-8080
+  tls:
+    termination: edge
+  wildcardPolicy: None

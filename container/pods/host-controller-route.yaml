@@ -1,0 +1,14 @@
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  name: hc-route
+spec:
+  to:
+    kind: Service
+    name: host-controller
+    weight: 100
+  port:
+    targetPort: host-controller-8080
+  tls:
+    termination: edge
+  wildcardPolicy: None

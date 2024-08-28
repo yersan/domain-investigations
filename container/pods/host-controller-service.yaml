@@ -1,0 +1,19 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: host-controller
+spec:
+  ipFamilies:
+    - IPv4
+  ports:
+    - name: host-controller-8080
+      protocol: TCP
+      port: 8080
+      targetPort: 8080
+  internalTrafficPolicy: Cluster
+  type: ClusterIP
+  ipFamilyPolicy: SingleStack
+  sessionAffinity: None
+  selector:
+    app: secondary-openshift
+

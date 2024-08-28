@@ -8,13 +8,27 @@ A demo that runs:
 * A first POD for a host controller + EAP server-1 based on openshift-ha-group to run web-clustering
 * A second POD for a host controller + EAP server-1 based on openshift-ha-group to run web-clustering
 
+* Create the posgresql server: 
+- Select a postgresql template from the catalog and instantiate it. 
+- Set the Database service name to be: database-server 
+- Set the user, password and database name to : todos-db
+
 * cd container/pods
 * oc create -f domain-controller-service.yaml
 * oc create -f domain-ping-service.yaml
 * oc create -f kubernetes-dc-pod.yaml
+* oc create -f host-controller-service.yaml
+* oc create -f host-controller-route.yaml
 * oc create -f kubernetes-hc-pod.yaml
+* oc create -f ha-service.yaml
 * oc create -f kubernetes-hc-ha-pod1.yaml
 * oc create -f kubernetes-hc-ha-pod2.yaml
+
+To access the non HA running applications:
+* <host-controller-route>/todo-backend
+
+To access the HA running application :
+* <ha-route>/web-clustering
 
 # Virtual machine demo
 The latest POC can be run without requiring to build container nor VM images:
