@@ -3,6 +3,10 @@ FROM registry.redhat.io/jboss-eap-8/eap8-openjdk17-builder-openshift-rhel8:lates
 # Set up environment variables for provisioning.
 ENV GALLEON_PROVISION_CHANNELS org.jboss.eap.channels:eap-8.0
 ENV GALLEON_USE_LOCAL_FILE true
+
+# Workaround https://issues.redhat.com/browse/JBEAP-27755
+ENV PROVISIONING_MAVEN_PLUGIN_VERSION 1.0.1.Final-redhat-00008
+
 RUN mkdir -p /tmp/src
 COPY --chown=jboss:root galleon /tmp/src/galleon
 
