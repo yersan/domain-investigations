@@ -25,6 +25,7 @@ A demo that runs:
   - oc create -f host-controller-route.yaml
   - oc create -f kubernetes-hc-pod.yaml
   - oc create -f ha-service.yaml
+  - oc create -f ha-route.yaml
   - oc create -f kubernetes-hc-ha-pod1.yaml
   - oc create -f kubernetes-hc-ha-pod2.yaml
 
