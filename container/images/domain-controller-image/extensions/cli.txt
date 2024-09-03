@@ -1,4 +1,4 @@
-embed-host-controller --std-out=echo --domain-config=openshift-domain.xml --host-config=my-host-primary.xml
+embed-host-controller --std-out=echo --domain-config=${env.JBOSS_EAP_DOMAIN_DOMAIN_CONFIG} --host-config=${env.JBOSS_EAP_DOMAIN_HOST_CONFIG}
 deploy /tmp/deployments/web-clustering.war --server-groups=openshift-ha-group --enabled
 deploy /tmp/deployments/todo-backend.war --server-groups=openshift-group --enabled
 stop-embedded-host-controller

@@ -23,12 +23,6 @@ function run_setup_shutdown_hook() {
 }
 run_setup_shutdown_hook
 
-# Execute extensions
-if [ -f $JBOSS_HOME/extensions/postconfigure.sh ]; then
-  log_info "Calling extensions/postconfigure.sh"
-  sh $JBOSS_HOME/extensions/postconfigure.sh
-fi
-
 # Copied from run launcher.
 source "${JBOSS_CONTAINER_WILDFLY_RUN_MODULE}/run-utils.sh"
 
@@ -59,7 +53,7 @@ if [ -n "$JBOSS_MODULES_SYSTEM_PKGS_APPEND" ]; then
   JBOSS_MODULES_SYSTEM_PKGS="$JBOSS_MODULES_SYSTEM_PKGS,$JBOSS_MODULES_SYSTEM_PKGS_APPEND"
 fi
 
- JAVA_OPTS="${JAVA_OPTS} -Djboss.modules.system.pkgs=${JBOSS_MODULES_SYSTEM_PKGS}"
+JAVA_OPTS="${JAVA_OPTS} -Djboss.modules.system.pkgs=${JBOSS_MODULES_SYSTEM_PKGS}"
 
 # DO WE KEEP?
 # White list packages for use in ObjectMessages: CLOUD-703
@@ -76,53 +70,85 @@ eval preConfigure
 eval configure
 
 imgName=${JBOSS_IMAGE_NAME:-$IMAGE_NAME}
-    imgVersion=${JBOSS_IMAGE_VERSION:-$IMAGE_VERSION}
+imgVersion=${JBOSS_IMAGE_VERSION:-$IMAGE_VERSION}
 
-    log_info "Running $imgName image, version $imgVersion"
+log_info "Running $imgName image, version $imgVersion"
 
-    # Handle port offset
-    if [ -n "${PORT_OFFSET}" ]; then
-      PORT_OFFSET_PROPERTY="-Djboss.socket.binding.port-offset=${PORT_OFFSET}"
-    fi
+if [ -n "$JBOSS_EAP_DOMAIN_PRIMARY_ADDRESS" ]; then
+  is_domain_controller="false"
+else
+  is_domain_controller="true"
+fi
 
-    PUBLIC_IP_ADDRESS=${SERVER_PUBLIC_BIND_ADDRESS:-$(hostname -i)}
-    MANAGEMENT_IP_ADDRESS=${SERVER_MANAGEMENT_BIND_ADDRESS:-0.0.0.0}
-    ENABLE_STATISTICS=${SERVER_ENABLE_STATISTICS:-true}
+# Handle port offset
+if [ -n "${PORT_OFFSET}" ]; then
+  PORT_OFFSET_PROPERTY="-Djboss.socket.binding.port-offset=${PORT_OFFSET}"
+fi
 
-    #Ensure node name (FOR NOW NEEDED PERHAPS REVISIT FOR EAP8)
-    run_init_node_name
-    #Only in host controller
-    if [ -n "$JBOSS_EAP_DOMAIN_PRIMARY_ADDRESS" ]; then
-      rm -rf /tmp/jvm-cli-script.cli
-      commands="
-        embed-host-controller --std-out=echo --host-config=$JBOSS_EAP_DOMAIN_HOST_CONFIG
-          if (outcome != success) of /host=$JBOSS_EAP_DOMAIN_HOST_NAME/jvm=openshift:read-resource
-            /host=$JBOSS_EAP_DOMAIN_HOST_NAME/jvm=openshift:add"
-          for option in $(echo $PREPEND_JAVA_OPTS); do
-            commands="$commands
-                /host=$JBOSS_EAP_DOMAIN_HOST_NAME/jvm=openshift:add-jvm-option(jvm-option=\"$option\")"
-          done
-      for option in $(echo $JAVA_OPTS); do
-        commands="$commands
-                /host=$JBOSS_EAP_DOMAIN_HOST_NAME/jvm=openshift:add-jvm-option(jvm-option=\"$option\")"
-      done
-      commands="$commands
-         end-if"
-      echo "$commands" >> /tmp/jvm-cli-script.cli
-      cat /tmp/jvm-cli-script.cli
-      $JBOSS_HOME/bin/jboss-cli.sh --file=/tmp/jvm-cli-script.cli
-    fi
-    if [ -n "$JBOSS_EAP_DOMAIN_PRIMARY_ADDRESS" ]; then
-      SERVER_ARGS="-Djboss.domain.primary.address=$JBOSS_EAP_DOMAIN_PRIMARY_ADDRESS $SERVER_ARGS"
-    fi
-    if [ -n "$JBOSS_EAP_DOMAIN_DOMAIN_CONFIG" ]; then
-      SERVER_ARGS="--domain-config=$JBOSS_EAP_DOMAIN_DOMAIN_CONFIG $SERVER_ARGS"
-    fi
-    if [ -n "$JBOSS_EAP_DOMAIN_HOST_CONFIG" ]; then
-      SERVER_ARGS="--host-config=$JBOSS_EAP_DOMAIN_HOST_CONFIG $SERVER_ARGS"
-    fi
-    SERVER_ARGS="${JAVA_PROXY_OPTIONS} -Djboss.node.name=${JBOSS_NODE_NAME} -Djboss.tx.node.id=${JBOSS_TX_NODE_ID} ${PORT_OFFSET_PROPERTY} -b ${PUBLIC_IP_ADDRESS} -bprivate ${PUBLIC_IP_ADDRESS} -bmanagement ${MANAGEMENT_IP_ADDRESS} -Dwildfly.statistics-enabled=${ENABLE_STATISTICS} ${SERVER_ARGS}"
-    $JBOSS_HOME/bin/domain.sh ${SERVER_ARGS} &
+PUBLIC_IP_ADDRESS=${SERVER_PUBLIC_BIND_ADDRESS:-$(hostname -i)}
+MANAGEMENT_IP_ADDRESS=${SERVER_MANAGEMENT_BIND_ADDRESS:-0.0.0.0}
+ENABLE_STATISTICS=${SERVER_ENABLE_STATISTICS:-true}
+JBOSS_EAP_DOMAIN_DOMAIN_CONFIG=${JBOSS_EAP_DOMAIN_DOMAIN_CONFIG:-openshift-domain.xml}
+
+if [ "$is_domain_controller" = "true" ]; then
+  default_host_name="primary"
+  JBOSS_EAP_DOMAIN_HOST_NAME="${JBOSS_EAP_DOMAIN_HOST_NAME:-$default_host_name}"
+  JBOSS_EAP_DOMAIN_HOST_CONFIG="${JBOSS_EAP_DOMAIN_HOST_CONFIG:-my-host-primary.xml}"
+else
+  default_host_name="secondary"
+  JBOSS_EAP_DOMAIN_HOST_NAME="${JBOSS_EAP_DOMAIN_HOST_NAME:-$default_host_name}"
+  JBOSS_EAP_DOMAIN_HOST_CONFIG="${JBOSS_EAP_DOMAIN_HOST_CONFIG:-my-host-secondary.xml}"
+fi
+
+# CLOUD-427: truncate transaction node-id JBOSS_TX_NODE_ID to the last 23 characters
+if [ ${#JBOSS_EAP_DOMAIN_HOST_NAME} -gt 23 ]; then
+  JBOSS_TX_NODE_ID=${JBOSS_EAP_DOMAIN_HOST_NAME: -23}
+else
+  JBOSS_TX_NODE_ID=${JBOSS_EAP_DOMAIN_HOST_NAME}
+fi
+
+rm -rf /tmp/jvm-cli-script.cli
+commands="
+    embed-host-controller --std-out=echo --host-config=$JBOSS_EAP_DOMAIN_HOST_CONFIG
+      /host=$default_host_name:write-attribute(name=name, value=$JBOSS_EAP_DOMAIN_HOST_NAME)"
+
+if [ "$is_domain_controller" = "false" ]; then
+  commands="$commands
+      if (outcome != success) of /host=$JBOSS_EAP_DOMAIN_HOST_NAME/jvm=openshift:read-resource
+        /host=$JBOSS_EAP_DOMAIN_HOST_NAME/jvm=openshift:add"
+  for option in $(echo $PREPEND_JAVA_OPTS); do
+    commands="$commands
+        /host=$JBOSS_EAP_DOMAIN_HOST_NAME/jvm=openshift:add-jvm-option(jvm-option=\"$option\")"
+  done
+  for option in $(echo $JAVA_OPTS); do
+    commands="$commands
+            /host=$JBOSS_EAP_DOMAIN_HOST_NAME/jvm=openshift:add-jvm-option(jvm-option=\"$option\")"
+  done
+  commands="$commands
+       end-if"
+  SERVER_ARGS="-Djboss.domain.primary.address=$JBOSS_EAP_DOMAIN_PRIMARY_ADDRESS $SERVER_ARGS"
+fi
+commands="$commands
+    quit"
+echo "$commands" >> /tmp/jvm-cli-script.cli
+echo "------- CLI script to configure the server -------"
+cat /tmp/jvm-cli-script.cli
+echo "--------------------------------------------------"
+$JBOSS_HOME/bin/jboss-cli.sh --file=/tmp/jvm-cli-script.cli
+
+# Execute extensions after our configurations, so users can override our settings
+if [ -f $JBOSS_HOME/extensions/postconfigure.sh ]; then
+  log_info "Calling extensions/postconfigure.sh"
+  sh $JBOSS_HOME/extensions/postconfigure.sh
+fi
+
+SERVER_ARGS="--domain-config=$JBOSS_EAP_DOMAIN_DOMAIN_CONFIG $SERVER_ARGS"
+SERVER_ARGS="--host-config=$JBOSS_EAP_DOMAIN_HOST_CONFIG $SERVER_ARGS"
+SERVER_ARGS="-Djboss.host.name=$JBOSS_EAP_DOMAIN_HOST_NAME $SERVER_ARGS"
+SERVER_ARGS="${JAVA_PROXY_OPTIONS} -Djboss.node.name=${JBOSS_EAP_DOMAIN_HOST_NAME} -Djboss.tx.node.id=${JBOSS_TX_NODE_ID} ${PORT_OFFSET_PROPERTY} -b ${PUBLIC_IP_ADDRESS} -bprivate ${PUBLIC_IP_ADDRESS} -bmanagement ${MANAGEMENT_IP_ADDRESS} -Dwildfly.statistics-enabled=${ENABLE_STATISTICS} ${SERVER_ARGS}"
+
+log_info "Launching domain with <<${SERVER_ARGS}>>"
+$JBOSS_HOME/bin/domain.sh ${SERVER_ARGS} &
 
 pid=$!
 wait $pid 2>/dev/null
