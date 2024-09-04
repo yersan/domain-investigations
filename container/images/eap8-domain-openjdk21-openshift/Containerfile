@@ -4,6 +4,9 @@ FROM registry.redhat.io/jboss-eap-8/eap8-openjdk17-builder-openshift-rhel8:lates
 ENV GALLEON_PROVISION_CHANNELS org.jboss.eap.channels:eap-8.0
 ENV GALLEON_USE_LOCAL_FILE true
 
+# Configure the driver version to provision can use MSSQLSERVER_DRIVER_VERSION, POSTGRESQL_DRIVER_VERSION or ORACLE_DRIVER_VERSION env
+ENV POSTGRESQL_DRIVER_VERSION 42.7.2.redhat-00001
+
 # Workaround https://issues.redhat.com/browse/JBEAP-27755
 ENV PROVISIONING_MAVEN_PLUGIN_VERSION 1.0.1.Final-redhat-00008
 
@@ -22,8 +25,6 @@ COPY --from=builder --chown=jboss:root $JBOSS_HOME $JBOSS_HOME
 COPY --chown=jboss:root run-domain.sh $JBOSS_HOME/bin
 RUN chmod a+x $JBOSS_HOME/bin/run-domain.sh
 
-# Copy custom modules
-COPY --chown=jboss:root modules $JBOSS_HOME/modules
 # Copy configurations
 COPY --chown=jboss:root configurations/*.xml $JBOSS_HOME/domain/configuration
 # Ensure appropriate permissions for the copied files.

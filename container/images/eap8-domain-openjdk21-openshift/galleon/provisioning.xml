@@ -8,4 +8,10 @@
             <include name="wildfly.s2i.common"/>
         </packages>
     </feature-pack>
+    <feature-pack location="org.jboss.eap:eap-datasources-galleon-pack:">
+        <packages inherit="false">
+            <!-- The list of supported drivers : com.microsoft.sqlserver, com.oracle.database.jdbc, org.postgresql.jdbc -->
+            <include name="org.postgresql.jdbc"/>
+        </packages>
+    </feature-pack>
 </installation>
