@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<module name="org.postgresql.jdbc" xmlns="urn:jboss:module:1.8">
-    <resources>
-        <resource-root path="postgresql-42.7.2.redhat-00001.jar"/>
-    </resources>
-    <dependencies>
-        <module name="wildflyee.api"/>
-    </dependencies>
-</module>
