@@ -100,13 +100,6 @@ else
   JBOSS_EAP_DOMAIN_HOST_CONFIG="${JBOSS_EAP_DOMAIN_HOST_CONFIG:-my-host-secondary.xml}"
 fi
 
-# CLOUD-427: truncate transaction node-id JBOSS_TX_NODE_ID to the last 23 characters
-if [ ${#JBOSS_EAP_DOMAIN_HOST_NAME} -gt 23 ]; then
-  JBOSS_TX_NODE_ID=${JBOSS_EAP_DOMAIN_HOST_NAME: -23}
-else
-  JBOSS_TX_NODE_ID=${JBOSS_EAP_DOMAIN_HOST_NAME}
-fi
-
 rm -rf /tmp/jvm-cli-script.cli
 commands="
     embed-host-controller --std-out=echo --host-config=$JBOSS_EAP_DOMAIN_HOST_CONFIG
@@ -136,6 +129,9 @@ cat /tmp/jvm-cli-script.cli
 echo "--------------------------------------------------"
 $JBOSS_HOME/bin/jboss-cli.sh --file=/tmp/jvm-cli-script.cli
 
+# Initialize JBOSS_NODE_NAME and JBOSS_TX_NODE_ID
+run_init_node_name
+
 # Execute extensions after our configurations, so users can override our settings
 if [ -f $JBOSS_HOME/extensions/postconfigure.sh ]; then
   log_info "Calling extensions/postconfigure.sh"
@@ -145,7 +141,7 @@ fi
 SERVER_ARGS="--domain-config=$JBOSS_EAP_DOMAIN_DOMAIN_CONFIG $SERVER_ARGS"
 SERVER_ARGS="--host-config=$JBOSS_EAP_DOMAIN_HOST_CONFIG $SERVER_ARGS"
 SERVER_ARGS="-Djboss.host.name=$JBOSS_EAP_DOMAIN_HOST_NAME $SERVER_ARGS"
-SERVER_ARGS="${JAVA_PROXY_OPTIONS} -Djboss.node.name=${JBOSS_EAP_DOMAIN_HOST_NAME} -Djboss.tx.node.id=${JBOSS_TX_NODE_ID} ${PORT_OFFSET_PROPERTY} -b ${PUBLIC_IP_ADDRESS} -bprivate ${PUBLIC_IP_ADDRESS} -bmanagement ${MANAGEMENT_IP_ADDRESS} -Dwildfly.statistics-enabled=${ENABLE_STATISTICS} ${SERVER_ARGS}"
+SERVER_ARGS="${JAVA_PROXY_OPTIONS} -Djboss.node.name=${JBOSS_NODE_NAME} -Djboss.tx.node.id=${JBOSS_TX_NODE_ID} ${PORT_OFFSET_PROPERTY} -b ${PUBLIC_IP_ADDRESS} -bprivate ${PUBLIC_IP_ADDRESS} -bmanagement ${MANAGEMENT_IP_ADDRESS} -Dwildfly.statistics-enabled=${ENABLE_STATISTICS} ${SERVER_ARGS}"
 
 log_info "Launching domain with <<${SERVER_ARGS}>>"
 $JBOSS_HOME/bin/domain.sh ${SERVER_ARGS} &
