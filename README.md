@@ -15,6 +15,18 @@ A demo that runs:
   - Set the Database service name to be: database-server 
   - Set the user, password and database name to : todos-db
 
+* Persistent Volume for DC deployments and configuration
+
+  - cd container/pods
+  - oc create -f persistent-volume.yaml
+  - oc create -f volume-init-pod.yaml
+  - oc rsync startup/dc domain-controller-init:/tmp/dc-init
+  - oc delete pod domain-controller-init
+
+* HC configuration
+
+  - oc create secret generic hc-setup --from-file=startup/hc
+
 * Create the EAP server resources
 
   - cd container/pods
@@ -38,20 +50,14 @@ A demo that runs:
 
 N.B.: You can kill one of the 2 ha pods, the session is persisted.
 
-# Building your own images
+# Building your own EAP image
 
 N.B.: replace `quay.io/jdenise` with the repo where you want to push the images`.
 N.B: If building and pushing your own images, you will need to update the pods resources that reference the images.
 
 * `cd container/images/eap8-domain-openjdk21-openshift/`
 * `podman build -t quay.io/jdenise/jboss-eap8-domain-openjdk21-openshift:latest .`
-* `cd ../domain-controller-image`
-* Update the `ContainerFile` to reference your own image built in step 1.
-* `podman build -t quay.io/jdenise/openshift-domain-controller:latest .`
-* `cd ../host-controller-image`
-* Update the `ContainerFile` to reference your own image built in step 1.
-* `podman build -t quay.io/jdenise/openshift-host-controller:latest .`
-* Push the domain-controller and host-controller images to your repository.
+
 
 # Virtual machine demo
 The latest POC can be run without requiring to build container nor VM images:

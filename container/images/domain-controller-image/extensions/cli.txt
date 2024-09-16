@@ -1,4 +1,0 @@
-embed-host-controller --std-out=echo --domain-config=openshift-domain.xml --host-config=my-host-primary.xml
-deploy /tmp/deployments/web-clustering.war --server-groups=openshift-ha-group --enabled
-deploy /tmp/deployments/todo-backend.war --server-groups=openshift-group --enabled
-stop-embedded-host-controller

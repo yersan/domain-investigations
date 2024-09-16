@@ -1,0 +1,21 @@
+kind: Pod
+apiVersion: v1
+metadata:
+  name: domain-controller-init
+  labels:
+    app: domain-controller-init
+spec:
+  restartPolicy: Always
+  terminationGracePeriodSeconds: 30
+  containers:
+    - name: alpine
+      image: alpine:latest
+      command: ['sleep', 'infinity']
+      volumeMounts:
+        - mountPath: /tmp/dc-init
+          name: dc-init-volume
+  volumes:
+    - name: dc-init-volume
+      persistentVolumeClaim:
+        claimName: dc-setup-volume
+        

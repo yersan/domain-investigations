@@ -1,6 +1,0 @@
-FROM quay.io/jdenise/jboss-eap8-domain-openjdk21-openshift:latest
-COPY --chown=jboss:root extensions $JBOSS_HOME/extensions
-RUN chmod a+x $JBOSS_HOME/extensions/postconfigure.sh
-# Copy deployments
-COPY --chown=jboss:root deployments /tmp/deployments
-

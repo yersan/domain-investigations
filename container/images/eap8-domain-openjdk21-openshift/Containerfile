@@ -26,6 +26,10 @@ RUN chmod a+x $JBOSS_HOME/bin/run-domain.sh
 COPY --chown=jboss:root modules $JBOSS_HOME/modules
 # Copy configurations
 COPY --chown=jboss:root configurations/*.xml $JBOSS_HOME/domain/configuration
+# Copy init entry-point
+
+COPY --chown=jboss:root init-hook $JBOSS_HOME
+
 # Ensure appropriate permissions for the copied files.
 RUN chmod -R ug+rwX $JBOSS_HOME
 

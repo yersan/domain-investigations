@@ -37,10 +37,19 @@ spec:
           value: demo
         - name: JBOSS_EAP_DOMAIN_PASSWORD
           value: demo
+        - name: JBOSS_EAP_DOMAIN_DOMAIN_INIT_PATH
+          value: /tmp/domain-init
       ports:
         - containerPort: 8080
           protocol: TCP
       imagePullPolicy: IfNotPresent
       terminationMessagePolicy: File
-      image: 'quay.io/jdenise/openshift-host-controller:demo-2.2'
+      image: 'quay.io/jdenise/jboss-eap8-domain-openjdk21-openshift:3.0'
+      volumeMounts:
+        - mountPath: /tmp/domain-init
+          name: hc-init-secret
+  volumes:
+    - name: hc-init-secret
+      secret:
+        secretName: hc-setup
   
