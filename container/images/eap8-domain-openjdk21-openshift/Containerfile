@@ -33,5 +33,11 @@ COPY --chown=jboss:root init-hook $JBOSS_HOME
 # Ensure appropriate permissions for the copied files.
 RUN chmod -R ug+rwX $JBOSS_HOME
 
+# install packages required to rsync the deployments
+USER root
+RUN microdnf --setopt=install_weak_deps=0 --setopt=tsflags=nodocs install -y rsync \
+            && microdnf clean all \
+            && rpm -q rsync
+USER jboss
 CMD ["sh", "-c", "${JBOSS_HOME}/bin/run-domain.sh"]
 
