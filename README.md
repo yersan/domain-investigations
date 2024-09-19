@@ -20,7 +20,7 @@ A demo that runs:
   - cd container/pods
   - oc create -f persistent-volume.yaml
   - oc create -f kubernetes-dc-pod.yaml
-  - oc rsync startup/dc/ domain-controller:/tmp/domain-init
+  - oc rsync startup/dc/v1/ domain-controller:/tmp/domain-init
   - oc delete pod domain-controller
 
 * HC configuration
@@ -52,22 +52,11 @@ N.B.: You can kill one of the 2 ha pods, the session is persisted.
 
 # Updating deployments
 
-## With a DC restart
-
-We are here updating the deployments, stopping and restarting the DC.
-
-* oc delete pod domain-controller
-* Replace in kubernetes-dc-pod.yaml '/tmp/domain-init/v1' by '/tmp/domain-init/v2'
-* oc create -f kubernetes-dc-pod.yaml
-* BUT then we need to reload the HC once they are reconnected
-
-## With no DC restart
-
 We are here updating the deployments, log to the DC, run the CLI script to update and reload the host controllers.
 
-* Log to the DC terminal
-* $JBOSS_HOME/bin/jboss-cli.sh -c --file=/tmp/domain-init/upgrade.cli (an undeploy followed by a deploy).
-* Make sure to update the kubernetes-dc-pod.yaml file with '/tmp/domain-init/v1' replaced by '/tmp/domain-init/v2'
+* oc rsync startup/dc/v2/ domain-controller:/tmp/domain-init
+* install the cli plugin for kubectl: https://github.com/jmesnil/kubectl-jboss-cli/tree/main
+* kubectl jboss-cli -p domain-controller -f ./startup/dc/upgrade.cli
 
 # Building your own EAP image
 
