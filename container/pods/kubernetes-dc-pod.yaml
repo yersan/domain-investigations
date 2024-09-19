@@ -33,13 +33,13 @@ spec:
         - name: JBOSS_EAP_DOMAIN_PASSWORD
           value: demo
         - name: JBOSS_EAP_DOMAIN_DOMAIN_INIT_PATH
-          value: /tmp/domain-init/v1
+          value: /tmp/domain-init
       ports:
         - containerPort: 9990
           protocol: TCP
       imagePullPolicy: IfNotPresent
       terminationMessagePolicy: File
-      image: 'quay.io/jdenise/jboss-eap8-domain-openjdk21-openshift:6.0'
+      image: 'quay.io/jdenise/jboss-eap8-domain-openjdk21-openshift:7.0'
       volumeMounts:
         - mountPath: /tmp/domain-init
           name: dc-init-volume

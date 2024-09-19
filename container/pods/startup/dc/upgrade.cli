@@ -1,2 +1,2 @@
 deployment undeploy web-clustering.war --server-groups=openshift-ha-group
-deployment deploy-file /tmp/domain-init/v2/deployments/web-clustering.war --server-groups=openshift-ha-group --enabled
+deployment deploy-file /tmp/domain-init/deployments/web-clustering.war --server-groups=openshift-ha-group --enabled

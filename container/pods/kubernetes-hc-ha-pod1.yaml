@@ -46,7 +46,7 @@ spec:
           protocol: TCP
       imagePullPolicy: IfNotPresent
       terminationMessagePolicy: File
-      image: 'quay.io/jdenise/jboss-eap8-domain-openjdk21-openshift:6.0'
+      image: 'quay.io/jdenise/jboss-eap8-domain-openjdk21-openshift:7.0'
       volumeMounts:
         - mountPath: /tmp/domain-init
           name: hc-init-secret

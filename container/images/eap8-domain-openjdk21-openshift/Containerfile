@@ -38,6 +38,9 @@ USER root
 RUN microdnf --setopt=install_weak_deps=0 --setopt=tsflags=nodocs install -y rsync \
             && microdnf clean all \
             && rpm -q rsync
+RUN microdnf --setopt=install_weak_deps=0 --setopt=tsflags=nodocs install -y tar \
+            && microdnf clean all \
+            && rpm -q tar
 USER jboss
 CMD ["sh", "-c", "${JBOSS_HOME}/bin/run-domain.sh"]
 
