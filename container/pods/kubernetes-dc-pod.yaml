@@ -23,7 +23,9 @@ spec:
         - name: JBOSS_EAP_DOMAIN_HOST_CONFIG
           value: my-host-primary.xml
         - name: JBOSS_EAP_DOMAIN_HOST_NAME
-          value: primary
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
         - name: JBOSS_EAP_DOMAIN_DOMAIN_CONFIG
           value: openshift-domain.xml
         - name: JBOSS_EAP_DOMAIN_USER
@@ -37,7 +39,7 @@ spec:
           protocol: TCP
       imagePullPolicy: IfNotPresent
       terminationMessagePolicy: File
-      image: 'quay.io/jdenise/jboss-eap8-domain-openjdk21-openshift:5.0'
+      image: 'quay.io/jdenise/jboss-eap8-domain-openjdk21-openshift:6.0'
       volumeMounts:
         - mountPath: /tmp/domain-init
           name: dc-init-volume

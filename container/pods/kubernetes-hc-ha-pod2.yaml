@@ -24,7 +24,9 @@ spec:
         - name: JBOSS_EAP_DOMAIN_HOST_CONFIG
           value: my-host-ha.xml
         - name: JBOSS_EAP_DOMAIN_HOST_NAME
-          value: hc-ha2-openshift
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
         - name: TERM
           value: xterm
         - name: KUBERNETES_NAMESPACE
@@ -44,7 +46,7 @@ spec:
           protocol: TCP
       imagePullPolicy: IfNotPresent
       terminationMessagePolicy: File
-      image: 'quay.io/jdenise/jboss-eap8-domain-openjdk21-openshift:5.0'
+      image: 'quay.io/jdenise/jboss-eap8-domain-openjdk21-openshift:6.0'
       volumeMounts:
         - mountPath: /tmp/domain-init
           name: hc-init-secret

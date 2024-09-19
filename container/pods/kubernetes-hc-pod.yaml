@@ -24,7 +24,9 @@ spec:
         - name: JBOSS_EAP_DOMAIN_HOST_CONFIG
           value: my-host.xml
         - name: JBOSS_EAP_DOMAIN_HOST_NAME
-          value: secondary-openshift
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
         - name: JAVA_MAX_MEM_RATIO
           value: "70.0"
         - name: TERM
