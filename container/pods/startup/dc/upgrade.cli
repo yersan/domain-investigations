@@ -1,2 +1,1 @@
-deployment undeploy web-clustering.war --server-groups=openshift-ha-group
-deployment deploy-file /tmp/domain-init/deployments/web-clustering.war --server-groups=openshift-ha-group --enabled
+deploy ${env.JBOSS_EAP_DOMAIN_DOMAIN_INIT_PATH}/deployments/web-clustering.war --headers={rollout openshift-ha-group(rolling-to-servers=true)} --force
