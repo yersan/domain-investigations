@@ -20,6 +20,27 @@ spec:
           memory: 64Mi
       terminationMessagePath: /dev/termination-log
       name: ternary-host-controller-container
+      livenessProbe:
+        exec:
+          command:
+          - /bin/bash
+          - -c
+          - /opt/server/bin/livenessProbe.sh
+        initialDelaySeconds: 60
+      startupProbe:
+        exec:
+          command:
+          - /bin/bash
+          - -c
+          - /opt/server/bin/livenessProbe.sh
+        initialDelaySeconds: 60
+      readinessProbe:
+        exec:
+          command:
+          - /bin/bash
+          - -c
+          - /opt/server/bin/readinessProbe.sh
+        initialDelaySeconds: 10
       env:
         - name: JBOSS_EAP_DOMAIN_HOST_CONFIG
           value: my-host-ha.xml
@@ -41,12 +62,14 @@ spec:
           value: demo
         - name: JBOSS_EAP_DOMAIN_DOMAIN_INIT_PATH
           value: /tmp/domain-init
+        - name: JBOSS_EAP_DOMAIN_SERVER_NAME
+          value: server-one
       ports:
         - containerPort: 8080
           protocol: TCP
       imagePullPolicy: IfNotPresent
       terminationMessagePolicy: File
-      image: 'quay.io/jdenise/jboss-eap8-domain-openjdk21-openshift:7.0'
+      image: 'quay.io/jdenise/jboss-eap8-domain-openjdk21-openshift:16.0'
       volumeMounts:
         - mountPath: /tmp/domain-init
           name: hc-init-secret

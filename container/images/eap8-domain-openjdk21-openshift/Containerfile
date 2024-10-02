@@ -41,6 +41,24 @@ RUN microdnf --setopt=install_weak_deps=0 --setopt=tsflags=nodocs install -y rsy
 RUN microdnf --setopt=install_weak_deps=0 --setopt=tsflags=nodocs install -y tar \
             && microdnf clean all \
             && rpm -q tar
+
+#ENV JBOSS_CONTAINER_PROMETHEUS_MODULE /opt/jboss/container/prometheus
+
+#COPY --chown=jboss:root prometheus/ /
+
+#RUN microdnf --setopt=install_weak_deps=0 --setopt=tsflags=nodocs install -y prometheus-jmx-exporter-openjdk17 \
+#            && microdnf clean all \
+#            && rpm -q prometheus-jmx-exporter-openjdk17
+
+COPY --chown=jboss:root probes/ $JBOSS_HOME/bin
+RUN chmod -R ug+rwX $JBOSS_HOME
+RUN microdnf --setopt=install_weak_deps=0 --setopt=tsflags=nodocs install -y python36 \
+            && microdnf clean all \
+            && rpm -q python36
+RUN microdnf --setopt=install_weak_deps=0 --setopt=tsflags=nodocs install -y python3-requests \
+            && microdnf clean all \
+            && rpm -q python3-requests
+
 USER jboss
 CMD ["sh", "-c", "${JBOSS_HOME}/bin/run-domain.sh"]
 
