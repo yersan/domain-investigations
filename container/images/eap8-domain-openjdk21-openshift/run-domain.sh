@@ -94,10 +94,18 @@ imgName=${JBOSS_IMAGE_NAME:-$IMAGE_NAME}
     #Only in host controller
     if [ -n "$JBOSS_EAP_DOMAIN_PRIMARY_ADDRESS" ]; then
       rm -rf /tmp/jvm-cli-script.cli
+     # if [ "${AB_PROMETHEUS_ENABLE^^}" = "TRUE" ]; then
+     #   prometheus="
+     #   /host=$JBOSS_EAP_DOMAIN_HOST_NAME/jvm=openshift:add-jvm-option(jvm-option=\"-javaagent:/usr/share/java/prometheus-jmx-exporter/jmx_prometheus_javaagent.jar=${AB_PROMETHEUS_JMX_EXPORTER_PORT:-9799}:${AB_PROMETHEUS_JMX_EXPORTER_CONFIG:-/opt/jboss/container/prometheus/etc/jmx-exporter-config.yaml}\"
+     #   /host=$JBOSS_EAP_DOMAIN_HOST_NAME/jvm=openshift:add-jvm-option(jvm-option=\"-Djboss.modules.system.pkgs=org.jboss.byteman,org.jboss.logmanager\")
+     #   /host=$JBOSS_EAP_DOMAIN_HOST_NAME/jvm=openshift:add-jvm-option(jvm-option=\"-Xbootclasspath/a:$JBOSS_HOME/modules/system/layers/base/org/jboss/logmanager/main/jboss-logmanager-2.1.19.Final-redhat-00001.jar\")
+     #   /host=$JBOSS_EAP_DOMAIN_HOST_NAME/jvm=openshift:add-jvm-option(jvm-option=\"-Djava.util.logging.manager=org.jboss.logmanager.LogManager\")"
+     # fi
       commands="
         embed-host-controller --std-out=echo --host-config=$JBOSS_EAP_DOMAIN_HOST_CONFIG
           if (outcome != success) of /host=$JBOSS_EAP_DOMAIN_HOST_NAME/jvm=openshift:read-resource
             /host=$JBOSS_EAP_DOMAIN_HOST_NAME/jvm=openshift:add"
+            #$prometheus"
           for option in $(echo $PREPEND_JAVA_OPTS); do
             commands="$commands
                 /host=$JBOSS_EAP_DOMAIN_HOST_NAME/jvm=openshift:add-jvm-option(jvm-option=\"$option\")"
