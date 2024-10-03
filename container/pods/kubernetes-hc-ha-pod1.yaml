@@ -64,12 +64,16 @@ spec:
           value: /tmp/domain-init
         - name: JBOSS_EAP_DOMAIN_SERVER_NAME
           value: server-one
+        - name: ADMIN_USERNAME
+          value: foo
+        - name: ADMIN_PASSWORD
+          value: foo
       ports:
         - containerPort: 8080
           protocol: TCP
       imagePullPolicy: IfNotPresent
       terminationMessagePolicy: File
-      image: 'quay.io/jdenise/jboss-eap8-domain-openjdk21-openshift:16.0'
+      image: 'quay.io/jdenise/jboss-eap8-domain-openjdk21-openshift:20.0'
       volumeMounts:
         - mountPath: /tmp/domain-init
           name: hc-init-secret

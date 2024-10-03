@@ -29,6 +29,7 @@ COPY --chown=jboss:root configurations/*.xml $JBOSS_HOME/domain/configuration
 # Copy init entry-point
 
 COPY --chown=jboss:root init-hook $JBOSS_HOME
+COPY --chown=jboss:root admin/* $JBOSS_HOME/bin/launch
 
 # Ensure appropriate permissions for the copied files.
 RUN chmod -R ug+rwX $JBOSS_HOME

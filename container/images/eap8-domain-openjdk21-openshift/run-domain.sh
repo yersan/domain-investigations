@@ -23,12 +23,6 @@ function run_setup_shutdown_hook() {
 }
 run_setup_shutdown_hook
 
-# Execute extensions
-if [ -f $JBOSS_HOME/extensions/postconfigure.sh ]; then
-  log_info "Calling extensions/postconfigure.sh"
-  sh $JBOSS_HOME/extensions/postconfigure.sh
-fi
-
 # Copied from run launcher.
 source "${JBOSS_CONTAINER_WILDFLY_RUN_MODULE}/run-utils.sh"
 
@@ -93,7 +87,16 @@ imgName=${JBOSS_IMAGE_NAME:-$IMAGE_NAME}
     run_init_node_name
     #Only in host controller
     if [ -n "$JBOSS_EAP_DOMAIN_PRIMARY_ADDRESS" ]; then
-      rm -rf /tmp/jvm-cli-script.cli
+      commands="
+        embed-host-controller --std-out=echo --host-config=$JBOSS_EAP_DOMAIN_HOST_CONFIG"
+      CLI_SCRIPT_FILE=/tmp/jvm-cli-script.cli
+      rm -rf "$CLI_SCRIPT_FILE"
+      echo "$commands" >> "$CLI_SCRIPT_FILE"
+      # Secure the HC management interface if required
+      unset -f configure
+      source $JBOSS_HOME/bin/launch/host-admin.sh
+      configure
+
      # if [ "${AB_PROMETHEUS_ENABLE^^}" = "TRUE" ]; then
      #   prometheus="
      #   /host=$JBOSS_EAP_DOMAIN_HOST_NAME/jvm=openshift:add-jvm-option(jvm-option=\"-javaagent:/usr/share/java/prometheus-jmx-exporter/jmx_prometheus_javaagent.jar=${AB_PROMETHEUS_JMX_EXPORTER_PORT:-9799}:${AB_PROMETHEUS_JMX_EXPORTER_CONFIG:-/opt/jboss/container/prometheus/etc/jmx-exporter-config.yaml}\"
@@ -102,7 +105,6 @@ imgName=${JBOSS_IMAGE_NAME:-$IMAGE_NAME}
      #   /host=$JBOSS_EAP_DOMAIN_HOST_NAME/jvm=openshift:add-jvm-option(jvm-option=\"-Djava.util.logging.manager=org.jboss.logmanager.LogManager\")"
      # fi
       commands="
-        embed-host-controller --std-out=echo --host-config=$JBOSS_EAP_DOMAIN_HOST_CONFIG
           if (outcome != success) of /host=$JBOSS_EAP_DOMAIN_HOST_NAME/jvm=openshift:read-resource
             /host=$JBOSS_EAP_DOMAIN_HOST_NAME/jvm=openshift:add"
             #$prometheus"
@@ -116,10 +118,16 @@ imgName=${JBOSS_IMAGE_NAME:-$IMAGE_NAME}
       done
       commands="$commands
          end-if"
-      echo "$commands" >> /tmp/jvm-cli-script.cli
+      echo "$commands" >> "$CLI_SCRIPT_FILE"
       cat /tmp/jvm-cli-script.cli
       $JBOSS_HOME/bin/jboss-cli.sh --file=/tmp/jvm-cli-script.cli
     fi
+    # Execute extensions
+    if [ -f $JBOSS_HOME/extensions/postconfigure.sh ]; then
+        log_info "Calling extensions/postconfigure.sh"
+        sh $JBOSS_HOME/extensions/postconfigure.sh
+    fi
+
     if [ -n "$JBOSS_EAP_DOMAIN_PRIMARY_ADDRESS" ]; then
       SERVER_ARGS="-Djboss.domain.primary.address=$JBOSS_EAP_DOMAIN_PRIMARY_ADDRESS $SERVER_ARGS"
     fi
