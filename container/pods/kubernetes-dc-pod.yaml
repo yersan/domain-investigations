@@ -39,7 +39,7 @@ spec:
           protocol: TCP
       imagePullPolicy: IfNotPresent
       terminationMessagePolicy: File
-      image: 'quay.io/jdenise/jboss-eap8-domain-openjdk21-openshift:20.0'
+      image: 'quay.io/jdenise/jboss-eap8-domain-openjdk21-openshift:23.0'
       volumeMounts:
         - mountPath: /tmp/domain-init
           name: dc-init-volume

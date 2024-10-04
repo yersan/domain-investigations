@@ -39,7 +39,7 @@ function configure_administration() {
     elif [ "${mode}" = "cli" ]; then
       cat << EOF >> "${CLI_SCRIPT_FILE}"
       if (outcome != success) of /host=$JBOSS_EAP_DOMAIN_HOST_NAME/core-service=management/management-interface=http-interface:read-resource
-        echo You have set environment variables to configure http-interface security-realm. Fix your configuration to contain the http-interface for this to happen. >> \${error_file}
+        echo You have set environment variables to configure http-interface security-realm. Fix your configuration to contain the http-interface for this to happen.
         exit
       end-if
       if (result == undefined) of /host=$JBOSS_EAP_DOMAIN_HOST_NAME/core-service=management/management-interface=http-interface:read-attribute(name=http-authentication-factory)

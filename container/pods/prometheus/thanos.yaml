@@ -1,0 +1,8 @@
+kind: ThanosQuerier
+apiVersion: monitoring.rhobs/v1alpha1
+metadata:
+ name: eap-demo
+spec:
+ selector:
+   matchLabels:
+     eap: eap-monitoring-stack

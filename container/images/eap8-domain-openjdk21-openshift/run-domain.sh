@@ -97,17 +97,14 @@ imgName=${JBOSS_IMAGE_NAME:-$IMAGE_NAME}
       source $JBOSS_HOME/bin/launch/host-admin.sh
       configure
 
-     # if [ "${AB_PROMETHEUS_ENABLE^^}" = "TRUE" ]; then
-     #   prometheus="
-     #   /host=$JBOSS_EAP_DOMAIN_HOST_NAME/jvm=openshift:add-jvm-option(jvm-option=\"-javaagent:/usr/share/java/prometheus-jmx-exporter/jmx_prometheus_javaagent.jar=${AB_PROMETHEUS_JMX_EXPORTER_PORT:-9799}:${AB_PROMETHEUS_JMX_EXPORTER_CONFIG:-/opt/jboss/container/prometheus/etc/jmx-exporter-config.yaml}\"
-     #   /host=$JBOSS_EAP_DOMAIN_HOST_NAME/jvm=openshift:add-jvm-option(jvm-option=\"-Djboss.modules.system.pkgs=org.jboss.byteman,org.jboss.logmanager\")
-     #   /host=$JBOSS_EAP_DOMAIN_HOST_NAME/jvm=openshift:add-jvm-option(jvm-option=\"-Xbootclasspath/a:$JBOSS_HOME/modules/system/layers/base/org/jboss/logmanager/main/jboss-logmanager-2.1.19.Final-redhat-00001.jar\")
-     #   /host=$JBOSS_EAP_DOMAIN_HOST_NAME/jvm=openshift:add-jvm-option(jvm-option=\"-Djava.util.logging.manager=org.jboss.logmanager.LogManager\")"
-     # fi
+      if [ "${AB_PROMETHEUS_ENABLE^^}" = "TRUE" ]; then
+        prometheus="
+        /host=$JBOSS_EAP_DOMAIN_HOST_NAME/jvm=openshift:write-attribute(name=module-options, value=[\"-javaagent:/usr/share/java/prometheus-jmx-exporter/jmx_prometheus_javaagent.jar=${AB_PROMETHEUS_JMX_EXPORTER_PORT:-9799}:${AB_PROMETHEUS_JMX_EXPORTER_CONFIG:-/opt/jboss/container/prometheus/etc/jmx-exporter-config.yaml}\"])"
+      fi
       commands="
           if (outcome != success) of /host=$JBOSS_EAP_DOMAIN_HOST_NAME/jvm=openshift:read-resource
-            /host=$JBOSS_EAP_DOMAIN_HOST_NAME/jvm=openshift:add"
-            #$prometheus"
+            /host=$JBOSS_EAP_DOMAIN_HOST_NAME/jvm=openshift:add
+            $prometheus"
           for option in $(echo $PREPEND_JAVA_OPTS); do
             commands="$commands
                 /host=$JBOSS_EAP_DOMAIN_HOST_NAME/jvm=openshift:add-jvm-option(jvm-option=\"$option\")"

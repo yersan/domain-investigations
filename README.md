@@ -50,6 +50,12 @@ A demo that runs:
 
 N.B.: You can kill one of the 2 ha pods, the session is persisted.
 
+# Prometheus Monitoring
+
+* cd prometheus
+* Then follow the README file
+
+
 # Updating deployments
 
 We are here updating the deployments, log to the DC, run the CLI script to update and reload the host controllers.

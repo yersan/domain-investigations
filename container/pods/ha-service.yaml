@@ -2,6 +2,8 @@ kind: Service
 apiVersion: v1
 metadata:
   name: ha-service
+  labels:
+    app: eap-demo
 spec:
   ipFamilies:
     - IPv4
@@ -10,6 +12,10 @@ spec:
       protocol: TCP
       port: 8080
       targetPort: 8080
+    - name: prometheus
+      protocol: TCP
+      port: 9799
+      targetPort: 9799
   internalTrafficPolicy: Cluster
   type: ClusterIP
   ipFamilyPolicy: SingleStack

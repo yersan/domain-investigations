@@ -64,12 +64,17 @@ spec:
           value: /tmp/domain-init
         - name: JBOSS_EAP_DOMAIN_SERVER_NAME
           value: server-one
+        - name: AB_PROMETHEUS_ENABLE
+          value: "true"
       ports:
         - containerPort: 8080
           protocol: TCP
+        - containerPort: 9799
+          protocol: TCP
+          name: prometheus
       imagePullPolicy: IfNotPresent
       terminationMessagePolicy: File
-      image: 'quay.io/jdenise/jboss-eap8-domain-openjdk21-openshift:20.0'
+      image: 'quay.io/jdenise/jboss-eap8-domain-openjdk21-openshift:23.0'
       volumeMounts:
         - mountPath: /tmp/domain-init
           name: hc-init-secret

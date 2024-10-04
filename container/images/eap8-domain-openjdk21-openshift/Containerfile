@@ -43,13 +43,13 @@ RUN microdnf --setopt=install_weak_deps=0 --setopt=tsflags=nodocs install -y tar
             && microdnf clean all \
             && rpm -q tar
 
-#ENV JBOSS_CONTAINER_PROMETHEUS_MODULE /opt/jboss/container/prometheus
+ENV JBOSS_CONTAINER_PROMETHEUS_MODULE /opt/jboss/container/prometheus
 
-#COPY --chown=jboss:root prometheus/ /
+COPY --chown=jboss:root prometheus/ /
 
-#RUN microdnf --setopt=install_weak_deps=0 --setopt=tsflags=nodocs install -y prometheus-jmx-exporter-openjdk17 \
-#            && microdnf clean all \
-#            && rpm -q prometheus-jmx-exporter-openjdk17
+RUN microdnf --setopt=install_weak_deps=0 --setopt=tsflags=nodocs install -y prometheus-jmx-exporter-openjdk17 \
+            && microdnf clean all \
+            && rpm -q prometheus-jmx-exporter-openjdk17
 
 COPY --chown=jboss:root probes/ $JBOSS_HOME/bin
 RUN chmod -R ug+rwX $JBOSS_HOME

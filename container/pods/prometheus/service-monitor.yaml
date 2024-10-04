@@ -1,0 +1,13 @@
+apiVersion: monitoring.rhobs/v1
+kind: ServiceMonitor
+metadata:
+ name: eap-demo
+ labels:
+   monitoredby: eap-monitoring-stack
+spec:
+ endpoints:
+   - port: prometheus
+   - path: /
+ selector:
+   matchLabels:
+     app: eap-demo

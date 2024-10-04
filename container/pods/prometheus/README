@@ -1,0 +1,12 @@
+
+* oc create -f monitoring-stack.yaml
+* oc create -f thanos.yaml
+* oc expose service thanos-querier-eap-demo
+* oc create -f service-monitor.yaml
+* oc get route ha-route -o jsonpath='{"http://"}{.spec.host}{"\n"}'
+* In a web browser access to the printed URL/web-clustering
+* oc get route thanos-querier-eap-demo -o jsonpath='{"http://"}{.spec.host}{"\n"}'
+* In a web browser access to the printed URL
+* Then Execute the query: jboss_undertow_request_count_total
+You should see value increasing when accessing the application
+
