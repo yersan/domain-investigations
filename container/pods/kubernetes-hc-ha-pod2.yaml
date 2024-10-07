@@ -25,21 +25,21 @@ spec:
           command:
           - /bin/bash
           - -c
-          - /opt/server/bin/livenessProbe.sh
+          - /opt/server/bin/launch/http-probe.sh
         initialDelaySeconds: 60
       startupProbe:
         exec:
           command:
           - /bin/bash
           - -c
-          - /opt/server/bin/livenessProbe.sh
+          - /opt/server/bin/launch/http-probe.sh
         initialDelaySeconds: 60
       readinessProbe:
         exec:
           command:
           - /bin/bash
           - -c
-          - /opt/server/bin/readinessProbe.sh
+          - /opt/server/bin/launch/http-probe.sh
         initialDelaySeconds: 10
       env:
         - name: JBOSS_EAP_DOMAIN_HOST_CONFIG
@@ -74,7 +74,7 @@ spec:
           name: prometheus
       imagePullPolicy: IfNotPresent
       terminationMessagePolicy: File
-      image: 'quay.io/jdenise/jboss-eap8-domain-openjdk21-openshift:23.0'
+      image: 'quay.io/jdenise/jboss-eap8-domain-openjdk21-openshift:26.0'
       volumeMounts:
         - mountPath: /tmp/domain-init
           name: hc-init-secret
