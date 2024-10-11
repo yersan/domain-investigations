@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jboss-eap8-standalone
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: jboss-eap8-standalone
+  template:
+    metadata:
+      labels:
+        app: jboss-eap8-standalone
+    spec:
+      initContainers:
+      - name: init-pv
+        image: busybox
+        command: [ "/bin/sh", "-c" ]
+        args:
+        - |
+          echo "Initializing Persistent Volume data"
+          if [ ! -d /common-standalone-data/deployments ]; then
+            echo "Creating /common-standalone-data/deployments"
+            mkdir /common-standalone-data/deployments
+          fi
+          if [ ! -d /common-standalone-data/persistent-configuration ]; then
+            echo "Creating /common-standalone-data/persistent-configuration"
+            mkdir /common-standalone-data/persistent-configuration
+          fi
+          if [ ! -f /common-standalone-data/persistent-configuration/persistent-standalone.xml ]; then
+            echo "Creating /common-standalone-data/persistent-configuration/persistent-standalone.xml"
+            touch /common-standalone-data/persistent-configuration/persistent-standalone.xml
+          fi
+        volumeMounts:
+        - name: eap-standalone-deployments
+          mountPath: /common-standalone-data
+      containers:
+      - name: jboss-eap8-standalone
+        image: quay.io/yborgess/jboss-eap8-standalone:latest
+        ports:
+        - containerPort: 8080
+        - containerPort: 9990
+        volumeMounts:
+        - name: eap-standalone-deployments
+          mountPath: /opt/server/standalone/deployments
+          subPath: deployments
+        - name: eap-standalone-deployments
+          mountPath: /opt/server/standalone/configuration/persistent-standalone.xml
+          subPath: persistent-configuration/persistent-standalone.xml
+        env:
+          - name: SERVER_LAUNCH_SCRIPT_OVERRIDE
+            value: "custom-openshift-launch.sh"
+      volumes:
+      - name: eap-standalone-deployments
+        persistentVolumeClaim:
+          claimName: standalone-pvc
+
